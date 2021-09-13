@@ -2,16 +2,16 @@
 using namespace std;
 
 //Variaveis Globais
-int ACC=0,PC=0;
+int ACC=INT_MIN,PC=0;
 typedef struct instr{
     string nome;
     int opcode;
     int tamanho;
 }instrucao_def;
-list<int*> Data;
-map<int, instrucao_def> Mapa_de_Comando;
+map<int,int> Data; //endereço:vlr
 string Arquivo_de_entrada_str;
 vector<int> Arquivo_de_entrada;
+
 
 
 //Funcoes
@@ -58,101 +58,134 @@ int conversor_str_int(string str){
     return n;
 }
 
-vector<instrucao_def> Cria_Tab_Comando(){//Tabela com Instruçoes sem Space e Const
-    vector<instrucao_def> Tabela;
-    instrucao_def instrucao;
-    instrucao.nome="ADD";
-    instrucao.opcode=1;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-    
-    instrucao.nome="SUB";
-    instrucao.opcode=2;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
 
-    instrucao.nome="MUL";
-    instrucao.opcode=3;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="DIV";
-    instrucao.opcode=4;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="JMP";
-    instrucao.opcode=5;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="JMPN";
-    instrucao.opcode=6;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="JMPP";
-    instrucao.opcode=7;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="JMPZ";
-    instrucao.opcode=8;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="COPY";
-    instrucao.opcode=9;
-    instrucao.tamanho=3;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="LOAD";
-    instrucao.opcode=10;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="STORE";
-    instrucao.opcode=11;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="INPUT";
-    instrucao.opcode=12;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="OUTPUT";
-    instrucao.opcode=13;
-    instrucao.tamanho=2;
-    Tabela.push_back(instrucao);
-
-    instrucao.nome="STOP";
-    instrucao.opcode=14;
-    instrucao.tamanho=1;
-    Tabela.push_back(instrucao);
-        
-    return Tabela;
-}
 
 void set_data(){
     int opcode;
-    for(int i=0; i<Arquivo_de_entrada.size();i++){//Colocando o PC no inicio do data section
+    for(int i=0; i<Arquivo_de_entrada.size();i+=2){//Colocando o PC no inicio do data section
         PC++;
         PC++;
         if(Arquivo_de_entrada[i]==9){//COPY
             PC++;
+            i++;
         }else if(Arquivo_de_entrada[i]==14){
             PC--;
             break;
         }
     }
-    vector<int>::iterator it-=find(Arquivo_de_entrada.begin(),Arquivo_de_entrada.end(),14);
+    vector<int>::iterator it=find(Arquivo_de_entrada.begin(),Arquivo_de_entrada.end(),14);
     ++it;//iterator tbm está no inicio do data_sec
     for(it; it!=Arquivo_de_entrada.end();++it){
+        Data[PC]=*it;//add o valor no data_section a lista
+        PC++;
+    }
+    PC=0;
+}
+
+void simulador(){
+    int STOP=0,instrucao=0,input;
+    while(!STOP){
+        cout<<ACC<<"PC:"<<PC<<endl;
+        switch(Arquivo_de_entrada[PC]){
+            case 1://ADD
+                PC++;
+                ACC+=Data[Arquivo_de_entrada[PC]];
+                PC++;
+            break;
+
+            case 2://SUB
+                PC++;
+                ACC-=Data[Arquivo_de_entrada[PC]];
+                PC++;
+            break;
+
+            case 3://MUL
+                PC++;
+                ACC*=Data[Arquivo_de_entrada[PC]];
+                PC++;
+            break;
+
+            case 4://DIV
+                PC++;
+                ACC/=Data[Arquivo_de_entrada[PC]];
+                PC++;
+            break;
+
+            case 5://JMP
+                PC++;
+                PC=Arquivo_de_entrada[PC];
+            break;
+            
+            case 6://JMPN
+                PC++;
+                if(ACC<0){
+                    PC=Arquivo_de_entrada[PC];
+                }else{
+                    PC++;
+                }
+
+            break;
+
+            case 7://JMPP
+                PC++;
+                if(ACC>0){
+                    PC=Arquivo_de_entrada[PC];
+                }else{
+                    PC;;
+                }
+
+            break;
+
+            case 8://JMPZ
+                PC++;
+                if(ACC==0){
+                    PC=Arquivo_de_entrada[PC];
+                }else{
+                    PC++;
+                }
+            break;
+
+            case 9://COPY
+                PC++;
+                Arquivo_de_entrada[PC+1]=Arquivo_de_entrada[PC];
+                PC++;
+                PC++;
+            break;
+
+            case 10://LOAD
+                PC++;
+                ACC=Arquivo_de_entrada[PC];
+                PC++;
+            break;
+
+            case 11://STORE
+                PC++;
+                Data[PC]=ACC;
+                PC++;
+            break;
+
+            case 12://INPUT
+                PC++;
+                cin>>input;
+                Data[PC]=input;
+                PC++;
+            break;
+
+            case 13://OUTPUT
+                PC++;
+                cout<<Data[PC]<<endl;
+                PC++;
+            break;
+
+            case 14://STOP
+                STOP=1;
+                PC++;
+            break;
+        }
         
     }
-
 }
+
 
 int main(int argc, char *argv[]){
     Arquivo_de_entrada_str = Ler_entrada(argv[1]);
@@ -169,14 +202,21 @@ int main(int argc, char *argv[]){
         }
         Arquivo_de_entrada_str.erase(Arquivo_de_entrada_str.begin());
     }
-    //inicializando PC e ACC em 16 bits de 0
+
 
     for(int i=0; i<Arquivo_de_entrada.size();i++){
         cout<<Arquivo_de_entrada[i]<<" ";
     }
     cout<<endl;
 
+    set_data();
 
+    map<int, int>::iterator it;
+    for(it=Data.begin();it!=Data.end();it++){//Sec data
+        cout<<it->first<<" s:"<<it->second<<endl;
+    }
+
+    simulador();
 
     return 0;
 }
