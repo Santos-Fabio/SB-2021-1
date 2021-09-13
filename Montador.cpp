@@ -182,7 +182,7 @@ int conversor_str_int(string str){
 
 //Funcoes
 
-string Ler_linha(){
+string Ler_linha(int n_linha){
     char c;
     string comando,label,argumentos,linha,op_str;
     size_t found;
@@ -204,7 +204,7 @@ string Ler_linha(){
             c = linha.front();
             it = find(caracteres_especiais.begin(),caracteres_especiais.end(),c);
             if(it!=caracteres_especiais.end()){
-                cout<<"Caracter Invalido_ Erro Lexico Linha:"<<PC<<endl;
+                cout<<"Caracter Invalido_ Erro Lexico Linha:"<<n_linha<<endl;
                 break;
             }
             linha.erase(linha.begin());
@@ -214,7 +214,7 @@ string Ler_linha(){
                 fim_label = true;
             }
             if((c!=' ' && c!=':' && fim_label==true) || (!label.empty() && (label[0]>='0' && label[0]<='9'))){
-                cout<<"Erro Lexico na linha: "<<PC<<endl;
+                cout<<"Erro Lexico na linha: "<<n_linha<<endl;
             }
             if(c==':'){break;}
         }
@@ -430,10 +430,10 @@ string Ler_linha(){
             }
             //cout<<arg1<<"   "<<arg2<<endl;
             if(arg1==arg2){
-                cout<<"Error Semantico na Linha: "<<(PC-1)<<".Uso do mesmo argumentos no comando COPY."<<endl;
+                cout<<"Error Semantico na Linha: "<<(n_linha)<<".Uso do mesmo argumentos no comando COPY."<<endl;
             }
             if(virgula!=1){
-                cout<<"Erro Sintatico na Linha: "<<(PC-1)<<"COPY espera uma única \',\' para separar os argumentos"<<endl;
+                cout<<"Erro Sintatico na Linha: "<<(n_linha)<<"COPY espera uma única \',\' para separar os argumentos"<<endl;
             }
             if(Tabela_Simbolos.empty()){
                 Rotulo.nome = arg1;
@@ -744,7 +744,7 @@ int main(int argc, char *argv[]){
 
 
     for(int i=0; !Arquivo_de_entrada.empty();i++){
-        string teste = Ler_linha();
+        string teste = Ler_linha(i);
         if((Sec_text==true&&Sec_data==false)&&teste!="\n"){
             text_true_data_false_final=1;
             correcao_texto=1;
