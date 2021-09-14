@@ -696,11 +696,59 @@ void Saida_Text_com_Pilha(){
 
 void error_linha(string linha_processada, int n_linha){
     size_t found;
+    int comeco_comando=0,qtd_arg=1,virgulas=0;
+    //Duplo Rotulo na linha
     found = linha_processada.find(":");
-    if(found!=string::npos){//Erro de duplo rotulo
-        cout<<"Erro Sintático linha: "<<n_linha<<". Dupla declaração de rótulo"<<endl;
+    if(found!=string::npos){
+        cout<<"Erro Sintático linha: "<<n_linha<<". Dupla declaração de rótulo na linha"<<endl;
     }
-    
+    //Erros de Argumento
+    map<string, instrucao_def>::iterator it = Operacao.begin();
+    string comando_l,argumento_l1,argumento_l2;
+    for(int i=0; i<linha_processada.size();i++){
+        if(linha_processada[i]==' '){
+            break;
+        }
+        comando_l.push_back(linha_processada[i]);
+    }
+    char c;
+    found = linha_processada.find(",");
+    if(found!=string::npos){
+        qtd_arg=2;
+
+    }
+    if(comando_l=="STOP" || comando_l=="SPACE" || comando_l=="CONST"){
+        qtd_arg=0;
+    }else{
+        for(int i=comando_l.size(); i<linha_processada.size();i++){
+            c = linha_processada[i];
+            if(c==','){virgulas++;}
+            cout<<virgulas<<endl;
+            switch(virgulas){
+                case 0:
+                    argumento_l1.push_back(c);
+                    break;
+                case 1:
+                    argumento_l2.push_back(c);
+                    break;
+                default:
+                    cout<<"Erro Léxico linha: "<<n_linha<<endl;
+                    break;
+            }
+        }
+    }
+    if(!argumento_l2.empty()){argumento_l2.erase(argumento_l2.begin());}//remove , no inicio
+    cout<<argumento_l2<<"      "<<argumento_l1<<endl;
+    for(it; it!=Operacao.end();++it){
+        if(it->first == comando_l){
+            break;
+        }
+    }
+    if(it==Operacao.end()){
+        cout<<"Erro Léxico, comando não indentificado linha: "<<n_linha<<endl;
+    }else{
+
+    }
 }
 
 
@@ -740,7 +788,11 @@ int main(int argc, char *argv[]){
             }
         }
         cout<<teste<<endl;
-        error_linha(teste,i);
+        size_t achar_sd,achar_st;
+        achar_sd= teste.find("SECTION DATA");
+        achar_st=teste.find("SECTION TEXT");
+        if(achar_sd==string::npos && achar_st==string::npos){
+            error_linha(teste,i);}
         teste.erase(teste.begin(),teste.end());
     }
     ordem_sec_data.pop_back();
