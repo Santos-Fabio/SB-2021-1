@@ -21,7 +21,7 @@ vector<Simbolos> Tabela_Simbolos;
 int PC=0,pc_stop=0,correcao_texto=0;
 map<string, instrucao_def> Operacao;
 string Saida_Data,Saida_Text;
-bool Sec_text=false,Sec_data=false;
+bool Sec_text=false,Sec_data=false,jmp=false;
 
 //Conjunto de definicoes
 void def_carc_espec(){
@@ -334,6 +334,7 @@ string Ler_linha(int n_linha){
                 for(int j=7; j>=4;j--){
                     size_t achar = linha.find(Tabela_Comandos[j].nome);
                     if(achar!=string::npos){
+                    jmp=true;
                         Saida_Text.append(to_string(Tabela_Comandos[j].opcode));
                         Saida_Text.append(" ");
                         char c;
@@ -546,7 +547,7 @@ string Ler_linha(int n_linha){
                     for(int j=7; j>=4;j--){//jumps
                         found = linha.find(Tabela_Comandos[j].nome);
                         if(found != string::npos){
-                            //cout<<"JUMPEEI"<<endl;
+                        jmp=true;
                             op_int = Operacao[Tabela_Comandos[j].nome].opcode;
                             op_str.append(to_string(op_int));
                             Saida_Text.append(op_str);
@@ -697,10 +698,19 @@ void Saida_Text_com_Pilha(){
 void error_linha(string linha_processada, int n_linha){
     size_t found;
     int comeco_comando=0,qtd_arg=1,virgulas=0;
+    found  = linha_processada.find("STOP");
+    if(found!=string::npos){return;}
+    found  = linha_processada.find("SPACE");
+    if(found!=string::npos){return;}
+    found  = linha_processada.find("CONST");
+    if(found!=string::npos){return;}
+
+    if(linha_processada.size()==1 && (linha_processada.front()==' ' || linha_processada.front()=='\n') || linha_processada.size()==0){return;}
     //Duplo Rotulo na linha
     found = linha_processada.find(":");
     if(found!=string::npos){
-        cout<<"Erro Sintático linha: "<<n_linha<<". Dupla declaração de rótulo na linha"<<endl;
+        cout<<"Erro Sintático linha: "<<n_linha<<". Dupla declaração de rótulo na linha."<<endl;
+        return;
     }
     //Erros de Argumento
     map<string, instrucao_def>::iterator it = Operacao.begin();
@@ -717,13 +727,9 @@ void error_linha(string linha_processada, int n_linha){
         qtd_arg=2;
 
     }
-    if(comando_l=="STOP" || comando_l=="SPACE" || comando_l=="CONST"){
-        qtd_arg=0;
-    }else{
         for(int i=comando_l.size(); i<linha_processada.size();i++){
             c = linha_processada[i];
             if(c==','){virgulas++;}
-            cout<<virgulas<<endl;
             switch(virgulas){
                 case 0:
                     argumento_l1.push_back(c);
@@ -732,13 +738,12 @@ void error_linha(string linha_processada, int n_linha){
                     argumento_l2.push_back(c);
                     break;
                 default:
-                    cout<<"Erro Léxico linha: "<<n_linha<<endl;
+                    cout<<"Erro Sintático linha: "<<n_linha<<endl;
                     break;
             }
         }
-    }
+    //}
     if(!argumento_l2.empty()){argumento_l2.erase(argumento_l2.begin());}//remove , no inicio
-    cout<<argumento_l2<<"      "<<argumento_l1<<endl;
     for(it; it!=Operacao.end();++it){
         if(it->first == comando_l){
             break;
@@ -746,15 +751,28 @@ void error_linha(string linha_processada, int n_linha){
     }
     if(it==Operacao.end()){
         cout<<"Erro Léxico, comando não indentificado linha: "<<n_linha<<endl;
-    }else{
-
     }
 }
+
+void error_tab_simbolos(){//
+    vector<Simbolos>::iterator it = Tabela_Simbolos.begin();
+    for(it; it!=Tabela_Simbolos.end();++it){
+        //cout<<"Nome: "<<it->nome<<"\nDefinido: "<<it->def<<"\nvlr: "<<it->vlr<<"\nTopo: "<<it->pilha.top()<<endl;
+        if(it->def==0){
+            cout<<"Erro Semantico, rótulo não declarado: "<<it->nome<<endl;
+        }
+    }
+
+}
+
+
+
 
 
 
 int main(int argc, char *argv[]){
     Arquivo_de_entrada = Ler_entrada(argv[1]);
+    //cout<<Arquivo_de_entrada<<endl;
     int text_true_data_false_final=0;
     string ordem_sec_data;
 
@@ -787,13 +805,15 @@ int main(int argc, char *argv[]){
                 
             }
         }
-        cout<<teste<<endl;
+        //cout<<teste<<endl;
         size_t achar_sd,achar_st;
         achar_sd= teste.find("SECTION DATA");
         achar_st=teste.find("SECTION TEXT");
-        if(achar_sd==string::npos && achar_st==string::npos){
+        //cout<<achar_st<<":st "<<achar_sd<<":sd "<<jmp<<":jmp"<<endl;
+        if(achar_sd==string::npos && achar_st==string::npos && !jmp){
             error_linha(teste,i);}
         teste.erase(teste.begin(),teste.end());
+        jmp=false;
     }
     ordem_sec_data.pop_back();
     if(text_true_data_false_final){
@@ -863,7 +883,8 @@ int main(int argc, char *argv[]){
         arquivo_final.append(argv[1]);
         arquivo_final.replace(arquivo_final.size()-4,arquivo_final.size()-1,str1);
 
-                
+        error_tab_simbolos();
+
         ofstream Arquivo_de_saida(arquivo_final);
         Arquivo_de_saida<<Saida_Text;
         Arquivo_de_saida.close();
