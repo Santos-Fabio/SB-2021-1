@@ -195,11 +195,8 @@ string Ler_linha(int n_linha){
         Arquivo_de_entrada.erase(Arquivo_de_entrada.begin());
     }
     linha.append("\n");
-    cout<<linha;
-    cout<<"PC: "<<PC<<"  "<<linha;
     found = linha.find(':');
     if(found != string::npos){//Achou :, ou seja, tem label. Aqui salva a label na string
-        cout<<"TEM LABEL"<<endl;
         for(int i=0; i<found;i++){
             c = linha.front();
             it = find(caracteres_especiais.begin(),caracteres_especiais.end(),c);
@@ -224,8 +221,6 @@ string Ler_linha(int n_linha){
             }
         }
     }
-    cout<<linha;
-    cout<<label<<endl;
     found = linha.find("SECTION");
     if(found!=string::npos){//Se for linha de SECTION, altera a var global referente para true
         found = linha.find("DATA");
@@ -301,13 +296,11 @@ string Ler_linha(int n_linha){
                 espec_arg = argumento_linha.find(*carac_esp);
             }
             if(espec_arg!=string::npos){
-                cout<<"Erro Lexico na linha: "<<PC<<".Uso de caracter especial";
+                cout<<"Erro Lexico na linha: "<<n_linha<<".Uso de caracter especial";
                 break;
             }
         }
         int contador=0,comando_copy=0;
-       // cout<<linha<<"BUGABUGA"<<endl;
-       // cout<<label<<endl;
         size_t parou = linha.find(Tabela_Comandos[13].nome);
         if(parou!=string::npos){
             pc_stop=PC;
@@ -316,7 +309,6 @@ string Ler_linha(int n_linha){
             if(i<4 || i>7){
                 size_t achar = linha.find(Tabela_Comandos[i].nome);
                 if(achar!=string::npos){
-                    cout<<"Tab_nome:"<<Tabela_Comandos[i].nome<<" size="<<Tabela_Comandos[i].nome.size()<<endl;
                     Saida_Text.append(to_string(Tabela_Comandos[i].opcode));
                     Saida_Text.append(" ");
                     if(Tabela_Comandos[i].nome=="COPY"){
@@ -325,8 +317,6 @@ string Ler_linha(int n_linha){
                     char c;
                     while(true){
                         c = linha[Tabela_Comandos[i].nome.size()+contador];
-                        cout<<linha<<endl;
-                        cout<<Tabela_Comandos[i].nome.size()+contador<<"---c:"<<c<<endl;
                         if(c==' '){
                             contador++;
                         }else{
@@ -338,7 +328,6 @@ string Ler_linha(int n_linha){
                         contador++;
                         c = linha[Tabela_Comandos[i].nome.size()+contador];
                     }
-                    cout<<"argumentinho: "<<argumento_linha<<endl;
                     break;
                 }
             }else{//jmps
@@ -367,7 +356,7 @@ string Ler_linha(int n_linha){
                 }
             } 
         }
-//        cout<<argumento_linha<<" ARgumetnos"<<endl;
+
         PC++;
         if(!comando_copy){
             if(Tabela_Simbolos.empty()){
@@ -395,7 +384,6 @@ string Ler_linha(int n_linha){
             }
         }else{
             string arg1,arg2;
-            cout<<"ARG: "<<argumento_linha<<endl;
             char c = argumento_linha[0];
             int auxiliar=1,virgula=0;
             while(true){
@@ -410,13 +398,11 @@ string Ler_linha(int n_linha){
                 }else{
                     break;
                 }
-                cout<<auxiliar<<"AUX"<<endl;
-                cout<<argumento_linha<<" argL"<<endl;
                 if(auxiliar==10){break;}
             }
-//            cout<<arg1<<"&"<<arg2<<"AH"<<auxiliar<<endl;
+
             while(true){
-                //cout<<"C:"<<c<<"aux:"<<auxiliar<<endl;
+
                 auxiliar++;
                 if(auxiliar==argumento_linha.size()){break;}
                 c=argumento_linha[auxiliar];
@@ -428,7 +414,7 @@ string Ler_linha(int n_linha){
                     break;
                 }
             }
-            //cout<<arg1<<"   "<<arg2<<endl;
+
             if(arg1==arg2){
                 cout<<"Error Semantico na Linha: "<<(n_linha)<<".Uso do mesmo argumentos no comando COPY."<<endl;
             }
@@ -485,14 +471,13 @@ string Ler_linha(int n_linha){
         }
         
 
-        //PC--;
-        //if(comando_copy){PC++;}
+
         PC++;
     }
 
 
     
-    //if(Sec_data==true && Sec_text==false){
+
         if(!correcao_texto){
             for(int i=0; i<14;i++){//tab de comandos ADD ao STOP
                 if(i<4 || i>7){//Exclui Jumps, mexendo só com variaveis e consts
@@ -559,9 +544,6 @@ string Ler_linha(int n_linha){
                     }
                 }else{
                     for(int j=7; j>=4;j--){//jumps
-                        //cout<<"J"<<endl;
-                        //cout<<linha<<":linha"<<endl;
-                        //cout<<Tabela_Comandos[j].nome<<endl;
                         found = linha.find(Tabela_Comandos[j].nome);
                         if(found != string::npos){
                             //cout<<"JUMPEEI"<<endl;
@@ -618,7 +600,6 @@ string Ler_linha(int n_linha){
                 }
             }
         }
-    //}
     
 
 
@@ -645,12 +626,7 @@ void Saida_Text_com_Pilha(){
     for(int i=0; i<Tabela_Comandos.size();i++){//Mapa pelo opcode, ao inves do nome
         Operacao_op[Tabela_Comandos[i].opcode] = Tabela_Comandos[i];
     }
-    cout<<"saida la"<<saida_text_aux<<"size: "<<saida_text_aux.size()<<endl;
     for(string::reverse_iterator rfound = saida_text_aux.rbegin(); rfound!=saida_text_aux.rend();++rfound){
-        cout<<"PC: "<<PC<<endl;
-        for(int x=0; x<Tabela_Simbolos.size();x++){//Imprimindo Tabela de Simbolos
-            cout<<"TAB_S: "<<Tabela_Simbolos[x].nome<<" "<<Tabela_Simbolos[x].vlr<<" "<<Tabela_Simbolos[x].def<<" "<<Tabela_Simbolos[x].pilha.top()<<endl;
-        }
         if(*rfound!=' '){
             rduplas.push_back(*rfound);
             ++rfound;
@@ -659,16 +635,10 @@ void Saida_Text_com_Pilha(){
             duplas.push_back(rduplas[1]);}
             duplas.push_back(rduplas[0]);
             opcode_intsrucao_sec = conversor_str_int(duplas);
-            //cout<<opcode_intsrucao_sec<<endl;
-            //cout<<"PC:"<<PC<<endl;
-            //cout<<duplas<<endl;
-            //cout<<Operacao_op[opcode_intsrucao_sec].opcode<<"opcode"<<endl;
             if(Operacao_op[opcode_intsrucao_sec].opcode!=14){
                 if(Operacao_op[opcode_intsrucao_sec].opcode!=9){
                     for(int j=0; j<Operacao_op[opcode_intsrucao_sec].tamanho;j++){
                         dist = saida_text_aux.size() - distance(saida_text_aux.rbegin(),rfound)+2;
-                        //cout<<"dist"<<dist<<endl;
-                        //cout<<"PC "<<PC<<endl;
                         for(int i=0; i<Tabela_Simbolos.size();i++){
                             if(Tabela_Simbolos[i].pilha.top()==PC){
                                 vlr_a_ser_posto = Tabela_Simbolos[i].vlr;
@@ -678,7 +648,6 @@ void Saida_Text_com_Pilha(){
                             }
                         }
                         if(topo!=-1&&vlr_a_ser_posto!=-1){
-                            //cout<<"vlr:"<<vlr_a_ser_posto<<" PC:"<<PC<<" topo:"<<topo<<" opcode:"<<opcode_intsrucao_sec<<endl;
                             Saida_Text.insert(dist,(to_string(vlr_a_ser_posto)+" "));
                             break;
                         }
@@ -711,7 +680,6 @@ void Saida_Text_com_Pilha(){
                 }
             }else{PC--;}
         }else{
-            //cout<<endl;
         }
         duplas.erase(duplas.begin(),duplas.end());
         rduplas.erase(rduplas.begin(),rduplas.end());
@@ -726,17 +694,23 @@ void Saida_Text_com_Pilha(){
 
 
 
+void error_linha(string linha_processada, int n_linha){
+    size_t found;
+    found = linha_processada.find(":");
+    if(found!=string::npos){//Erro de duplo rotulo
+        cout<<"Erro Sintático linha: "<<n_linha<<". Dupla declaração de rótulo"<<endl;
+    }
+    
+}
+
 
 
 int main(int argc, char *argv[]){
     Arquivo_de_entrada = Ler_entrada(argv[1]);
-    cout<<Arquivo_de_entrada<<endl;
     int text_true_data_false_final=0;
     string ordem_sec_data;
 
-    for(int i=0; i<Tabela_Comandos.size();i++){//Imprimindo Tab de comando
-        cout<<"i "<<i<<":";
-        cout<<Tabela_Comandos[i].nome<<" "<<Tabela_Comandos[i].opcode<<" "<<Tabela_Comandos[i].tamanho<<endl;
+    for(int i=0; i<Tabela_Comandos.size();i++){//Criando Tab de comando
         Operacao[Tabela_Comandos[i].nome] = Tabela_Comandos[i];
     }
 
@@ -765,12 +739,13 @@ int main(int argc, char *argv[]){
                 
             }
         }
+        cout<<teste<<endl;
+        error_linha(teste,i);
         teste.erase(teste.begin(),teste.end());
     }
     ordem_sec_data.pop_back();
     if(text_true_data_false_final){
         Tabela_Simbolos.erase(Tabela_Simbolos.begin());
-        //Correcao PC DATA SECTION
         int new_pc = pc_stop;
                 new_pc++;
         for(int i=0; i<Saida_Data.size();i++){
@@ -785,7 +760,6 @@ int main(int argc, char *argv[]){
                     if(!ordem_sec_data.empty()){
                         c = ordem_sec_data[0];
                     }else{c=' ';}
-                    //cout<<"c:"<<c<<endl;
                     if(c!=' '){
                         tam_dado++;
                         dado.push_back(c);
@@ -794,8 +768,7 @@ int main(int argc, char *argv[]){
                         ordem_sec_data.erase(ordem_sec_data.begin());
                     }
                 }
-                //cout<<ordem_sec_data<<endl;
-                //cout<<dado<<endl;
+
                 for(int j=0; j<Tabela_Simbolos.size();j++){
                     if(dado == Tabela_Simbolos[j].nome){
                         Tabela_Simbolos[j].vlr=new_pc;
@@ -808,9 +781,6 @@ int main(int argc, char *argv[]){
             }
         }
     }
-    //cout<<ordem_sec_data<<endl;
-    cout<<"TEX:"<<Saida_Text<<endl;
-    cout<<"DATA:"<<Saida_Data<<endl;
 
 
         for(int i=0; i<Saida_Data.size();i++){
@@ -825,20 +795,7 @@ int main(int argc, char *argv[]){
             }
         }
         PC--;
-//        cout<<"TABELA FINAL: "<<endl;
-    for(int x=0; x<Tabela_Simbolos.size();x++){//Imprimindo Tabela de Simbolos
-        cout<<"TAB_S: "<<Tabela_Simbolos[x].nome<<" "<<Tabela_Simbolos[x].vlr<<" "<<Tabela_Simbolos[x].def<<" "<<Tabela_Simbolos[x].pilha.top()<<endl;
-        //cout<<"pilha_size"<<Tabela_Simbolos[x].pilha.size()<<endl;
-    }
-       /*cout<<"Tabela de Simbolos_Pilha:"<<endl;
-        for(int i=0; i<Tabela_Simbolos.size();i++){//Imprimindo Tabela de Simbolos
-            cout<<Tabela_Simbolos[i].nome<<": ";
-            while(!Tabela_Simbolos[i].pilha.empty()){
-                cout<<Tabela_Simbolos[i].pilha.top()<<" ";
-                Tabela_Simbolos[i].pilha.pop();
-            }
-            cout<<endl;
-        }*/
+
         if(!text_true_data_false_final){
             for(int i=0; i<Saida_Data.size();i++){
                 if(Saida_Data[i]!=' ' && Saida_Data[i]!='\n'){
@@ -846,16 +803,14 @@ int main(int argc, char *argv[]){
                 }
             }
         }
-       // cout<<pc_stop<<"STOP"<<endl;
+
         if(text_true_data_false_final){PC=pc_stop+1;}
         Saida_Text_com_Pilha();
         Saida_Text.append(Saida_Data);
         string arquivo_final, str1=".obj";
-        //char *argumento = argc[1];
         arquivo_final.append(argv[1]);
-        //cout<<arquivo_final<<endl;
         arquivo_final.replace(arquivo_final.size()-4,arquivo_final.size()-1,str1);
-        //cout<<arquivo_final<<endl;
+
                 
         ofstream Arquivo_de_saida(arquivo_final);
         Arquivo_de_saida<<Saida_Text;
