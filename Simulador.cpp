@@ -83,40 +83,49 @@ void set_data(){
 }
 
 void simulador(){
-    int STOP=0,instrucao=0,input;
+    int instrucao=0,input;
+    bool STOP=false;
     while(!STOP){
-        cout<<ACC<<"PC:"<<PC<<endl;
+        cout<<"------------------------------------------------------------------"<<endl;
+        cout<<"PC: "<<PC<<"\t\tACC: "<<ACC<<endl;
+        cout<<"Opcode:"<<Arquivo_de_entrada[PC]<<"\t";
         switch(Arquivo_de_entrada[PC]){
             case 1://ADD
+                cout<<"Instrução: "<<"ADD"<<endl;
                 PC++;
                 ACC+=Data[Arquivo_de_entrada[PC]];
                 PC++;
             break;
 
             case 2://SUB
+                cout<<"Instrução: "<<"SUB"<<endl;
                 PC++;
                 ACC-=Data[Arquivo_de_entrada[PC]];
                 PC++;
             break;
 
             case 3://MUL
+                cout<<"Instrução: "<<"MUL"<<endl;
                 PC++;
                 ACC*=Data[Arquivo_de_entrada[PC]];
                 PC++;
             break;
 
             case 4://DIV
+                cout<<"Instrução: "<<"DIV"<<endl;
                 PC++;
                 ACC/=Data[Arquivo_de_entrada[PC]];
                 PC++;
             break;
 
             case 5://JMP
+                cout<<"Instrução: "<<"JMP"<<endl;
                 PC++;
                 PC=Arquivo_de_entrada[PC];
             break;
             
             case 6://JMPN
+                cout<<"Instrução: "<<"JMPN"<<endl;
                 PC++;
                 if(ACC<0){
                     PC=Arquivo_de_entrada[PC];
@@ -127,16 +136,18 @@ void simulador(){
             break;
 
             case 7://JMPP
+                cout<<"Instrução: "<<"JMPP"<<endl;
                 PC++;
                 if(ACC>0){
                     PC=Arquivo_de_entrada[PC];
                 }else{
-                    PC;;
+                    PC++;
                 }
 
             break;
 
             case 8://JMPZ
+                cout<<"Instrução: "<<"JMPZ"<<endl;
                 PC++;
                 if(ACC==0){
                     PC=Arquivo_de_entrada[PC];
@@ -146,39 +157,47 @@ void simulador(){
             break;
 
             case 9://COPY
+                cout<<"Instrução: "<<"COPY"<<endl;
                 PC++;
-                Arquivo_de_entrada[PC+1]=Arquivo_de_entrada[PC];
+                Data[Arquivo_de_entrada[PC+1]]=Data[Arquivo_de_entrada[PC]];
                 PC++;
                 PC++;
             break;
 
             case 10://LOAD
+                cout<<"Instrução: "<<"LOAD"<<endl;
                 PC++;
-                ACC=Arquivo_de_entrada[PC];
+                ACC=Data[Arquivo_de_entrada[PC]];
                 PC++;
             break;
 
             case 11://STORE
+                cout<<"Instrução: "<<"STORE"<<endl;
                 PC++;
-                Data[PC]=ACC;
+                Data[Arquivo_de_entrada[PC]]=ACC;
                 PC++;
             break;
 
             case 12://INPUT
+                cout<<"Instrução: "<<"INPUT"<<endl;
                 PC++;
                 cin>>input;
-                Data[PC]=input;
+                Data[Arquivo_de_entrada[PC]]=input;
                 PC++;
             break;
 
             case 13://OUTPUT
+                cout<<"Instrução: "<<"OUTPUT"<<endl;
                 PC++;
-                cout<<Data[PC]<<endl;
+                cout<<Data[Arquivo_de_entrada[PC]]<<endl;
                 PC++;
+                cout<<"Digite ENTER para continuar a execução do programa"<<endl;
+                cin.get();
             break;
 
             case 14://STOP
-                STOP=1;
+                cout<<"Instrução: "<<"STOP"<<endl;
+                STOP=true;
                 PC++;
             break;
         }
@@ -203,19 +222,9 @@ int main(int argc, char *argv[]){
         Arquivo_de_entrada_str.erase(Arquivo_de_entrada_str.begin());
     }
 
-
-    for(int i=0; i<Arquivo_de_entrada.size();i++){
-        cout<<Arquivo_de_entrada[i]<<" ";
-    }
-    cout<<endl;
-
     set_data();
 
-    map<int, int>::iterator it;
-    for(it=Data.begin();it!=Data.end();it++){//Sec data
-        cout<<it->first<<" s:"<<it->second<<endl;
-    }
-
+    cout<<"Inínico do Simulador:\nPC: "<<PC<<"\nACC: "<<ACC<<"\n"<<endl;
     simulador();
 
     return 0;
