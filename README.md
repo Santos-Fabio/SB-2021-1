@@ -29,7 +29,7 @@ Caso o computador utilizado não tenha suporte para versões mais recentes do c+
 ```
 
 ## Execução
-Ambos os códigos necessitam que se passe o nome do arquivo juntamente com sua extensão, .asm para o montador e .obj para o simulador. Então aa execuções do montador e simulador devem seguir os seguintes comandos:
+Ambos os códigos necessitam que se passe o nome do arquivo juntamente com sua extensão, .asm para o montador e .obj para o simulador. Então as execuções do montador e simulador devem seguir os seguintes comandos:
 ```bash
 ./montador myprogram.asm
 ```
