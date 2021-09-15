@@ -182,6 +182,7 @@ void simulador(){
                 cout<<"Instrução: "<<"INPUT"<<endl;
                 PC++;
                 cin>>input;
+                getchar();//limpando buffer
                 Data[Arquivo_de_entrada[PC]]=input;
                 PC++;
             break;

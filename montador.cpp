@@ -617,8 +617,6 @@ string Ler_linha(int n_linha){
 
 
 
-
-
 void Saida_Text_com_Pilha(){
     int opcode_intsrucao_sec,dist,linha,topo,vlr_a_ser_posto;
     map<int,instrucao_def> Operacao_op;
@@ -761,6 +759,9 @@ void error_tab_simbolos(){//
         if(it->def==0){
             cout<<"Erro Semantico, rótulo não declarado: "<<it->nome<<endl;
         }
+        if(it->nome.size()>50){
+            cout<<"Erro Lexico, rotulo com mais de 50 caracteres: "<<it->nome;
+        }
     }
 
 }
@@ -888,7 +889,7 @@ int main(int argc, char *argv[]){
         ofstream Arquivo_de_saida(arquivo_final);
         Arquivo_de_saida<<Saida_Text;
         Arquivo_de_saida.close();
-        cout<<"TEXT PRONTO: "<<Saida_Text<<endl;;
+        //cout<<"TEXT PRONTO: "<<Saida_Text<<endl;;
     return 0;
 }
 
