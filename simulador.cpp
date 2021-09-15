@@ -11,6 +11,7 @@ typedef struct instr{
 map<int,int> Data; //endereço:vlr
 string Arquivo_de_entrada_str;
 vector<int> Arquivo_de_entrada;
+multimap<int,int> Linha;//PC:linha
 
 
 
@@ -82,12 +83,38 @@ void set_data(){
     PC=0;
 }
 
+void set_linha(){
+    int i=1;
+    Linha.insert(pair<int,int>(PC,i));
+    vector<int>::iterator it=Arquivo_de_entrada.begin();
+    for(it; it!=Arquivo_de_entrada.end();++it){
+        i++;
+        PC++;
+        PC++;
+        Linha.insert(pair<int,int>(PC,i));
+        if(Arquivo_de_entrada[PC]==9){
+            PC++;
+        }else if(Arquivo_de_entrada[PC]==14){
+            Linha.insert(pair<int,int>(PC,i));
+            break;
+        }
+    }
+    PC=0;
+}
+
 void simulador(){
     int instrucao=0,input;
     bool STOP=false;
     while(!STOP){
+        multimap<int,int>::iterator it=Linha.begin();
+        if(PC!=0){
+            for(int i=0; i<=PC;i++){
+                if(it->first==PC){break;}
+                ++it;
+            }
+        }
         cout<<"------------------------------------------------------------------"<<endl;
-        cout<<"PC: "<<PC<<"\t\tACC: "<<ACC<<endl;
+        cout<<"Linha: "<<it->second<<"\tPC: "<<PC<<"\tACC: "<<ACC<<endl;
         cout<<"Opcode:"<<Arquivo_de_entrada[PC]<<"\t";
         switch(Arquivo_de_entrada[PC]){
             case 1://ADD
@@ -224,8 +251,9 @@ int main(int argc, char *argv[]){
     }
 
     set_data();
+    set_linha();
 
-    cout<<"Inínico do Simulador:\nPC: "<<PC<<"\nACC: "<<ACC<<"\n"<<endl;
+    cout<<"Inínico do Simulador:\nLinha:0\nPC: "<<PC<<"\tACC: "<<ACC<<"\n"<<endl;
     simulador();
 
     return 0;
